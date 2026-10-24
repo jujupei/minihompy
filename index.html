@@ -573,7 +573,7 @@ function drawRoom(cv){
 /* 일촌평·방명록·다이어리는 모두 공유 저장소(db)에 보관 → 누구나 보고 누구나 쓸 수 있음 */
 let DB=null,ME=null,IS_ADMIN=false,IS_OWNER=false,sharedReady=false,sharedOff=false;
 let ilchon=[],ilErr='',guest=[],gbErr='';
-const mine=e=>false;
+const mine=e=>true;
 const fmtAt=t=>{if(!t)return'';const d=new Date(t),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`};
 const writeErr=err=>err&&err.code==='permission-denied'?'글이 너무 길거나 저장할 수 없는 내용이에요.':err&&err.code==='resource-exhausted'?'오늘 저장 한도를 넘었어요. 내일 다시 시도해 주세요.':'저장하지 못했어요. 잠시 후 다시 눌러 주세요.';
 const esc=s=>s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -643,7 +643,7 @@ function sharedDone(){sharedReady=true;diaryReady=true;renderIl();rerenderDiary(
   db.collection('guest').onSnapshot(snap=>{guest=snap.docs.filter(d=>d.exists).map(d=>({...d.data(),id:d.id})).sort((x,y)=>(y.at||0)-(x.at||0));gbErr='';if(left>0)one();else rerenderGuest()},
     err=>{gbErr='방명록을 불러오지 못했어요. 잠시 후 새로고침해 주세요.';if(left>0)one();else rerenderGuest()});
 }catch(e){sharedOff=true;canWrite=false;sharedDone()}})();
-async function writeDiary(k,body){if(!diaryDb)throw new Error('no db');const ref=diaryDb.doc('diary/'+k);await ref.set(body||{text:'',w:'',updatedAt:Date.now()})}
+async function writeDiary(k,body){if(!diaryDb)throw new Error('no db');const ref=diaryDb.doc('diary/'+k);if(body)await ref.set(body);else await ref.delete()}
 const T0=new Date(),TODAY=key(T0.getFullYear(),T0.getMonth(),T0.getDate());
 let calY=T0.getFullYear(),calM=T0.getMonth(),calSel=TODAY;
 function P_DIARY(){let s='';WD.forEach(d=>s+=`<div class="hd">${d}</div>`);
