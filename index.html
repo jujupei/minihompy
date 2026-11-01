@@ -935,11 +935,22 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});})();
 (function(){if(!/[?&]import=1/.test(location.search))return;
 const SEED={"guest": {"gb01": {"at": 1790770193000, "c": 1, "n": "왕이페이", "t": "사귈래 밥 먹을래"}, "gb02": {"at": 1790772931000, "c": 2, "n": "변의주", "t": "여보 밥 식어요......"}, "gb02b": {"at": 1790849005000, "c": 14, "n": "변의주", "t": "페이 대답"}, "gb03": {"at": 1790896190000, "c": 3, "n": "변의주", "t": "페이 너한테 벗어 주려고 겉옷 두 개 입었어"}, "gb04": {"at": 1791041287000, "c": 4, "n": "왕이페이", "t": "나는 나 보고 싶다고 징징거리는 의주 좋아하니까 이럴 땐 좀 욕심내"}, "gb05": {"at": 1791098080000, "c": 5, "n": "변의주", "t": "욕심 조금 더 부리고 잠이라도 더 줄일 수 있으면 줄여서 그렇게 너 보고 싶어서"}, "gb06": {"at": 1791125857000, "c": 6, "n": "변의주", "t": "페이가 나한테 와 줘서 너무 고마워 페이가 내 천사인데"}, "gb07": {"at": 1791213103000, "c": 7, "n": "왕이페이", "t": "치이익 변의주 타는 소리"}, "gb08": {"at": 1791244917000, "c": 8, "n": "왕이페이", "t": "주주우 나 두고 가지 마 못 가게 다리 붙들 거야"}, "gb09": {"at": 1791391682000, "c": 9, "n": "변의주", "t": "오늘도 내일도 내가 노력할게"}, "gb10": {"at": 1792179390000, "c": 10, "n": "변의주", "t": "페이가 항상 기다려 줬으니까 나도 기다릴게 나 페이 포기 절대로 안 할 거야 안 놓을 거야"}, "gb11": {"at": 1792336291000, "c": 11, "n": "왕이페이", "t": "역시 넌 등짝 때려 주는 여자가 좋은가 봐"}, "gb12": {"at": 1792425145000, "c": 12, "n": "변의주", "t": "나도 선악을 초월하는 사랑을 약속할게"}, "gb13": {"at": 1792669556000, "c": 13, "n": "변의주", "t": "머리에 너만 있어서 그래"}, "oqn3xq8z1z9unclaf943": {"at": 1792756380000, "c": 405747667, "n": "왕이페이", "t": "페이의 일기\n\n오늘은 내 주주가 엄청 힘들어 보이는 날이다 일이 너무 많아서 고생하는 것 같아 속상하다 그치만 나까지 시들시들할 수는 없지 주주 퇴근하면 맛있는 것 먹이고 꽉 안아서 달래 줄 거다 주주야 조금만 힘내"}, "gb15": {"at": 1793498700000, "c": 15, "n": "변의주", "t": "내 사랑 지금 무슨 꿈을 꾸고 있으려나"}}, "ilchon": {"1iq43uhovhsuhev700rs": {"at": 1790770140000, "n": "왕이페이", "r": "예비 부인", "t": "나랑 사귈래 밥 먹을래"}, "75so5fxsqpnxd447a6l1": {"at": 1790869920000, "n": "변의주", "r": "강아지", "t": "잘 자라고 해 줘 나 너밖에 없어"}, "hxconh9ydq3tnqp621k7": {"at": 1792412100000, "n": "변의주", "r": "내 사랑", "t": "팔 깨물어 페이야"}}, "diary": {"2026-09-30": {"text": "사귈래 밥 먹을래", "updatedAt": 1792466683238, "w": "맑음 ☀"}, "2026-10-10": {"text": "🍺 자주 짠 치자", "updatedAt": 1792672441090, "w": "맑음 ☀"}, "2026-10-12": {"text": "🎬 이프 온리", "updatedAt": 1792655760838, "w": "맑음 ☀"}, "2026-10-18": {"text": "선악을 초월하는 하트를 많이 만들자!", "updatedAt": 1792466716524, "w": "비 ☂"}, "2026-10-19": {"text": "❤️‍🔥", "updatedAt": 1792466787407, "w": "흐림 ☁"}, "2026-10-23": {"text": "🍺", "updatedAt": 1792806972539, "w": "바람 ≋"}, "2027-01-25": {"text": "100 ♡", "updatedAt": 1792672367796, "w": "맑음 ☀"}, "2027-02-13": {"text": "JUJU HBD", "updatedAt": 1792466819427, "w": "맑음 ☀"}}};
 function run(){if(!window.firebase||!firebase.apps.length){setTimeout(run,300);return}
-const db=firebase.firestore();let add=0,skip=0,fail=0;const jobs=[];
-db.collection('guest').get().then(gs=>{const have=new Set(gs.docs.map(d=>{const v=d.data()||{};return String(v.n||'')+'|'+String(v.t||'').trim()}));return have}).catch(()=>new Set()).then(have=>{
-for(const col in SEED)for(const id in SEED[col]){const v=SEED[col][id];if(col==='guest'&&have.has(String(v.n||'')+'|'+String(v.t||'').trim())){skip++;continue}
-jobs.push(db.doc(col+'/'+id).get().then(s=>{if(s.exists){skip++;return}return db.doc(col+'/'+id).set(v).then(()=>add++)}).catch(()=>fail++))}
-return Promise.all(jobs)}).then(()=>alert('옮기기 완료! 새로 추가 '+add+'개, 이미 있음 '+skip+'개'+(fail?', 실패 '+fail+'개':'')+'\n이제 주소에서 ?import=1 을 빼고 열면 돼요.'))}
+const db=firebase.firestore();
+const box=document.createElement('div');box.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#fff;border:2px solid #2a6f9b;border-radius:8px;padding:12px;font:13px/1.5 sans-serif;color:#222;max-height:80vh;overflow:auto;white-space:pre-wrap;box-shadow:0 4px 18px rgba(0,0,0,.3)';
+const log=m=>{box.textContent+=m+'\n'};const btn=document.createElement('button');btn.textContent='닫기';btn.style.cssText='display:block;margin-top:8px;padding:6px 14px';btn.onclick=()=>box.remove();
+document.body.appendChild(box);log('[방명록 올리기 v4]');
+const P={n:'변의주',t:'내 사랑 지금 무슨 꿈을 꾸고 있으려나',at:1793498700000,c:15};const fmt=t=>new Date(t).toLocaleString('ko-KR');
+const code=e=>(e&&(e.code||e.message))||String(e);
+(async()=>{
+ try{const g14=await db.doc('guest/gb14').get();log('gb14: '+(g14.exists?JSON.stringify(g14.data()):'없음'))}catch(e){log('gb14 읽기 실패: '+code(e))}
+ let same=[];try{const all=await db.collection('guest').get();log('방명록 전체: '+all.size+'개');
+  all.forEach(d=>{const v=d.data()||{};if(String(v.t||'').trim()===P.t)same.push({id:d.id,v})})}catch(e){log('방명록 읽기 실패: '+code(e))}
+ if(same.length){for(const x of same){log('같은 글 발견: '+x.id+' / '+x.v.n+' / '+(x.v.at?fmt(x.v.at):'시간 없음'));
+   if(x.v.at!==P.at||x.v.n!==P.n){try{await db.doc('guest/'+x.id).set({...x.v,n:P.n,at:P.at});log('→ 이름·시간을 11:05로 고침 ✅')}catch(e){log('→ 고치기 실패: '+code(e))}}
+   else log('→ 이미 올바르게 있음 ✅')}}
+ else{try{await db.doc('guest/gb15').set(P);log('새 글 올리기 성공 ✅ (gb15)')}catch(e){log('새 글 올리기 실패 ❌: '+code(e))}}
+ log('\n닫은 뒤 ?import=1 을 뺀 주소로 다시 열어 확인해 주세요.');box.appendChild(btn)
+})()}
 run()})();
 </script>
 <style>
