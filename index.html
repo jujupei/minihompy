@@ -580,13 +580,16 @@ const fmtAt=t=>{if(!t)return'';const d=new Date(t),p=n=>String(n).padStart(2,'0'
 const writeErr=err=>err&&err.code==='permission-denied'?'글이 너무 길거나 저장할 수 없는 내용이에요.':err&&err.code==='resource-exhausted'?'오늘 저장 한도를 넘었어요. 내일 다시 시도해 주세요.':'저장하지 못했어요. 잠시 후 다시 눌러 주세요.';
 const esc=s=>s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function now(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}
+/* 이미 저장된 일촌평 중 애칭을 '퍼피'로 바꿔 보여 줄 글 */
+const IL_PUPPY=[['변의주','마지막으로 남겨진 코끼리처럼 사랑해']];
+const ilNick=e=>{const n=String(e.n||'').trim(),t=String(e.t||'').replace(/\s+/g,' ').trim();return IL_PUPPY.some(([a,b])=>a===n&&b===t)?'퍼피':(e.r||'일촌')};
 function renderIl(){const ul=document.getElementById('illist');if(!ul)return;
   if(!sharedReady){ul.innerHTML='<li class="ilnone">일촌평을 불러오는 중…</li>';return}
   if(sharedOff){ul.innerHTML='<li class="ilnone">지금은 일촌평을 불러올 수 없어요.</li>';return}
   if(ilErr){ul.innerHTML=`<li class="ilnone">${ilErr}</li>`;return}
   if(!ilchon.length){ul.innerHTML='<li class="ilnone">아직 일촌평이 없어요. 첫 일촌평을 남겨 주세요!</li>';return}
   const ilN=Math.max(1,Math.ceil(ilchon.length/IL_PER));ilPage=Math.min(Math.max(0,ilPage),ilN-1);
-  ul.innerHTML=ilchon.slice(ilPage*IL_PER,ilPage*IL_PER+IL_PER).map(e=>`<li><span>·</span><span class="c">${esc(String(e.t||''))} <a class="n">(${esc(String(e.n||'나그네'))} <b>${esc(String(e.r||'일촌'))}</b>)</a><span class="d">${fmtAt(e.at)}</span></span>${mine(e)?`<button class="x" data-il="${esc(e.id)}" aria-label="삭제">✕</button>`:''}</li>`).join('')+ilPager(ilN)}
+  ul.innerHTML=ilchon.slice(ilPage*IL_PER,ilPage*IL_PER+IL_PER).map(e=>`<li><span>·</span><span class="c">${esc(String(e.t||''))} <a class="n">(${esc(String(e.n||'나그네'))} <b>${esc(String(ilNick(e)))}</b>)</a><span class="d">${fmtAt(e.at)}</span></span>${mine(e)?`<button class="x" data-il="${esc(e.id)}" aria-label="삭제">✕</button>`:''}</li>`).join('')+ilPager(ilN)}
 /* 일촌평 페이지 나누기 (한 페이지 8개, 방명록과 같은 방식) */
 const IL_PER=8;let ilPage=0;
 function ilPager(n){if(n<2)return'';let h='<li class="gbpager ilpager">';if(ilPage>0)h+=`<button type="button" data-ip="${ilPage-1}" aria-label="이전 페이지">◀</button>`;for(let i=0;i<n;i++)h+=`<button type="button" data-ip="${i}"${i===ilPage?' class="on" aria-current="page"':''}>${i+1}</button>`;if(ilPage<n-1)h+=`<button type="button" data-ip="${ilPage+1}" aria-label="다음 페이지">▶</button>`;return h+'</li>'}
@@ -827,7 +830,7 @@ content.addEventListener('submit',e=>{
   if(e.target.id==='ilform'){const t=document.getElementById('ilText').value.trim();if(!t)return document.getElementById('ilText').focus();
     const n=document.getElementById('ilName').value.trim()||'나그네',btn=e.target.querySelector('button[type=submit]');
     if(!DB){btn.textContent='불가';return}btn.disabled=true;
-    ilPage=0;DB.collection('ilchon').doc().set({t,n,r:'내 사랑',at:Date.now(),by:ME}).then(()=>{document.getElementById('ilText').value='';btn.disabled=false;btn.textContent='확인'}).catch(err=>{btn.disabled=false;btn.textContent='확인';const ul=document.getElementById('illist');if(ul)ul.insertAdjacentHTML('afterbegin',`<li class="ilnone warnt">${writeErr(err)}</li>`)});return}
+    ilPage=0;DB.collection('ilchon').doc().set({t,n,r:n==='왕이페이'?'내 사랑':'퍼피',at:Date.now(),by:ME}).then(()=>{document.getElementById('ilText').value='';btn.disabled=false;btn.textContent='확인'}).catch(err=>{btn.disabled=false;btn.textContent='확인';const ul=document.getElementById('illist');if(ul)ul.insertAdjacentHTML('afterbegin',`<li class="ilnone warnt">${writeErr(err)}</li>`)});return}
   if(e.target.id==='gbform'){const t=document.getElementById('gbText').value.trim();if(!t)return document.getElementById('gbText').focus();
     const n=document.getElementById('gbName').value.trim()||'나그네';const cols=[['#79c06a','#58a048'],['#f2a65a','#d9853a'],['#f48a9c','#d9667a']];
     const btn=e.target.querySelector('button[type=submit]'),msg=document.getElementById('gbMsg');if(!DB){msg.textContent='지금은 방명록을 남길 수 없어요.';return}btn.disabled=true;
