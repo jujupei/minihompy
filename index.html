@@ -606,7 +606,7 @@ const P_HOME=`
     <a data-photo="fox"><span class="tag t4">사진첩</span><span>주주 최애 여우</span></a>
   </div>
   <div class="stats">
-    <a data-go="jukebox">쥬크박스 <small>3/3</small></a>
+    <a data-go="jukebox">쥬크박스 <small id="jbCount">3/3</small></a>
     <a data-go="photo">사진첩 <small>10/486</small><i class="N">N</i></a>
     <a data-go="guest">방명록 <small id="gbCount">0/0</small><i class="N" id="gbNew" hidden>N</i></a>
     <a>즐겨찾기 <small>0/3</small></a>
@@ -790,7 +790,7 @@ const content=document.getElementById('content');
 function show(t){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   content.scrollTop=0;
-  if(t==='home'){content.innerHTML=P_HOME;renderIl();updateGbCount()}
+  if(t==='home'){content.innerHTML=P_HOME;renderIl();updateGbCount();updateJbCount()}
   else if(t==='diary')content.innerHTML=P_DIARY();
   else if(t==='jukebox')content.innerHTML=P_JUKE();
   else if(t==='photo')content.innerHTML=P_PHOTO;
@@ -894,7 +894,9 @@ document.getElementById('next').onclick=()=>loadTrack(cur+1);
 document.getElementById('vol').oninput=()=>{if(master)master.gain.value=vol()*.9;audio.volume=vol()};
 const plist=document.getElementById('plist');
 const YT='https://youtu.be/UiWzYvtDGqU';
-function renderList(){plist.innerHTML=TRACKS.map((t,i)=>`<a data-p="${i}" class="${i===cur?'on':''}">${i+1}. ${esc(t.title)}</a>`).join('')+
+/* 홈의 쥬크박스 숫자: 저장된 BGM 곡 수 / 곡 수 */
+function updateJbCount(){const c=document.getElementById('jbCount');if(c)c.textContent=`${TRACKS.length}/${TRACKS.length}`}
+function renderList(){updateJbCount();plist.innerHTML=TRACKS.map((t,i)=>`<a data-p="${i}" class="${i===cur?'on':''}">${i+1}. ${esc(t.title)}</a>`).join('')+
   `<label class="addf">＋ 내 음악 파일 추가<input type="file" id="fileIn" accept="audio/*" multiple hidden></label>`}
 document.getElementById('listBtn').onclick=()=>{plist.hidden=!plist.hidden;renderList()};
 plist.onclick=e=>{const a=e.target.closest('[data-p]');if(a){loadTrack(+a.dataset.p);start()}};
