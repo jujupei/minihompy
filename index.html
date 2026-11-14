@@ -580,9 +580,10 @@ const fmtAt=t=>{if(!t)return'';const d=new Date(t),p=n=>String(n).padStart(2,'0'
 const writeErr=err=>err&&err.code==='permission-denied'?'글이 너무 길거나 저장할 수 없는 내용이에요.':err&&err.code==='resource-exhausted'?'오늘 저장 한도를 넘었어요. 내일 다시 시도해 주세요.':'저장하지 못했어요. 잠시 후 다시 눌러 주세요.';
 const esc=s=>s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function now(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}
-/* 이미 저장된 일촌평 중 애칭을 '퍼피'로 바꿔 보여 줄 글 */
-const IL_PUPPY=[['변의주','마지막으로 남겨진 코끼리처럼 사랑해']];
-const ilNick=e=>{const n=String(e.n||'').trim(),t=String(e.t||'').replace(/\s+/g,' ').trim();return IL_PUPPY.some(([a,b])=>a===n&&b===t)?'퍼피':(e.r||'일촌')};
+/* 이미 저장된 일촌평 중 애칭을 '퍼피'로 바꿔 보여 줄 글: [작성자 이름에 들어간 글자, 내용에 들어간 글자] */
+const IL_PUPPY=[['의주','코끼리']];
+const ilClean=v=>String(v||'').replace(/[\s\u200b-\u200f\u2060\ufeff]/g,'');
+const ilNick=e=>{const n=ilClean(e.n),t=ilClean(e.t);return IL_PUPPY.some(([a,b])=>n.includes(a)&&t.includes(b))?'퍼피':(e.r||'일촌')};
 function renderIl(){const ul=document.getElementById('illist');if(!ul)return;
   if(!sharedReady){ul.innerHTML='<li class="ilnone">일촌평을 불러오는 중…</li>';return}
   if(sharedOff){ul.innerHTML='<li class="ilnone">지금은 일촌평을 불러올 수 없어요.</li>';return}
